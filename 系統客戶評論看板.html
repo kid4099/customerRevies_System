@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系統客戶評論看板</title>
+<style>
+:root{--bg:#0f1117;--s:#1a1d2e;--s2:#232740;--b:#2e3250;--t:#e8eaf6;--td:#8b92b8;--g:#00e676;--y:#ffd740;--r:#ff5252;--bl:#448aff;--p:#e040fb;--o:#ff9100;--tl:#1de9b6;--sf:#ff5252;--cl:#40c4ff;--pr:#b2ff59}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.hdr{background:linear-gradient(135deg,#1a1d2e,#0d1b2a);border-bottom:1px solid var(--b);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hdr h1{font-size:26px;font-weight:700;background:linear-gradient(90deg,#448aff,#e040fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
+.sub{color:var(--td);font-size:13px;margin-top:4px}
+.dbadge{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:8px 16px;font-size:13px;color:var(--bl)}
+.dbadge span{color:var(--td)}
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:20px 32px;background:var(--s);border-bottom:1px solid var(--b)}
+.sc{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:16px 20px;text-align:center}
+.scn{font-size:32px;font-weight:700;line-height:1;margin-bottom:6px}
+.scl{font-size:12px;color:var(--td);text-transform:uppercase;letter-spacing:1px}
+.sec{padding:24px 32px;border-bottom:1px solid var(--b)}
+.sh{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.snum{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#448aff,#e040fb);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.stit{font-size:18px;font-weight:600}
+.stit small{font-size:12px;color:var(--td);font-weight:400;margin-left:8px}
+.leg{display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;font-size:12px;color:var(--td)}
+.li{display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:10px}
+.scard{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:box-shadow .2s}
+.scard:hover{box-shadow:0 0 0 1px var(--bl)}
+.tl{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.tl.green{background:var(--g);box-shadow:0 0 8px var(--g)}
+.tl.yellow{background:var(--y);box-shadow:0 0 8px var(--y)}
+.tl.red{background:var(--r);box-shadow:0 0 8px var(--r)}
+.tl.flash{animation:fl .8s infinite}
+@keyframes fl{0%,100%{opacity:1;box-shadow:0 0 12px var(--r)}50%{opacity:.2;box-shadow:0 0 4px var(--r)}}
+.sn{font-size:12px;flex:1;line-height:1.4;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.savg{font-size:18px;font-weight:700;flex-shrink:0}
+.scnt{font-size:11px;color:var(--td);flex-shrink:0}
+.sbg{height:4px;background:var(--b);border-radius:2px;margin-top:4px}
+.sfill{height:4px;border-radius:2px}
+.abadge{background:var(--r);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;flex-shrink:0;animation:fl .8s infinite;white-space:nowrap}
+.ktabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.kt{padding:6px 14px;border-radius:20px;border:1px solid var(--b);background:var(--s2);color:var(--td);cursor:pointer;font-size:13px;transition:all .2s}
+.kt.active.safety{background:rgba(255,82,82,.2);border-color:var(--sf);color:var(--sf)}
+.kt.active.clean{background:rgba(64,196,255,.2);border-color:var(--cl);color:var(--cl)}
+.kt.active.process{background:rgba(178,255,89,.2);border-color:var(--pr);color:var(--pr)}
+.kt.active.all{background:rgba(68,138,255,.2);border-color:var(--bl);color:var(--bl)}
+.kcloud{display:flex;flex-wrap:wrap;gap:12px;align-items:center;min-height:80px}
+.ktag{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:7px 16px;cursor:pointer;transition:transform .15s;border:1px solid transparent;position:relative}
+.ktag:hover{transform:scale(1.08)}
+.ktag.safety{background:rgba(255,82,82,.15);border-color:rgba(255,82,82,.4);color:var(--sf)}
+.ktag.clean{background:rgba(64,196,255,.15);border-color:rgba(64,196,255,.4);color:var(--cl)}
+.ktag.process{background:rgba(178,255,89,.15);border-color:rgba(178,255,89,.4);color:var(--pr)}
+.kcnt{background:rgba(255,255,255,.15);border-radius:10px;padding:1px 7px;font-size:11px}
+.kpri{position:absolute;top:-7px;right:-4px;background:var(--r);color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
+.kdp{margin-top:16px;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:16px;display:none}
+.kdp.open{display:block}
+.kdp h4{font-size:14px;margin-bottom:10px}
+.ptag{display:inline-block;background:var(--s);border:1px solid var(--b);border-radius:6px;padding:3px 8px;font-size:12px;margin:3px;font-family:monospace;color:var(--y)}
+.vwrap{overflow-x:auto}
+.vt{width:100%;border-collapse:collapse;font-size:13px}
+.vt th{background:var(--s2);border:1px solid var(--b);padding:10px 14px;text-align:left;color:var(--td);font-size:11px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.vt td{border:1px solid var(--b);padding:10px 14px;vertical-align:middle}
+.vt tr:hover td{background:rgba(68,138,255,.05)}
+.vbw{display:flex;align-items:center;gap:8px;min-width:160px}
+.vbbg{flex:1;height:8px;background:var(--s2);border-radius:4px;overflow:hidden;border:1px solid var(--b)}
+.vbfill{height:100%;border-radius:4px}
+.vpct{font-size:13px;font-weight:700;min-width:48px;text-align:right}
+.vpl{font-family:monospace;font-size:14px;font-weight:700;color:var(--y);letter-spacing:1px}
+.vkl{display:flex;flex-wrap:wrap;gap:4px}
+.vkc{font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:var(--sf)}
+.ebtn{background:none;border:1px solid var(--b);color:var(--td);border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px}
+.ebtn:hover{border-color:var(--bl);color:var(--bl)}
+.cr{display:none}
+.cr.open{display:table-row}
+.cb{background:var(--s);border-radius:8px;padding:12px}
+.ci{border-bottom:1px solid var(--b);padding:8px 0;font-size:12px;display:flex;gap:12px;align-items:flex-start}
+.ci:last-child{border-bottom:none}
+.cst{color:var(--y);font-size:12px;flex-shrink:0}
+.ctxt{color:var(--td);line-height:1.6}
+footer{text-align:center;padding:20px;color:var(--td);font-size:12px;border-top:1px solid var(--b)}
+@media(max-width:768px){.srow{grid-template-columns:repeat(2,1fr);padding:16px}.sec{padding:20px 16px}.hdr{padding:20px 16px}.sgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div>
+    <h1>&#x1F4CA; 系統客戶評論看板</h1>
+    <div class="sub">機車租賃服務 &#183; 客戶回饋即時監控系統</div>
+  </div>
+  <div class="dbadge"><span>資料區間：</span>2026/04/01 &nbsp;&#8212;&nbsp; 2026/04/12</div>
+</header>
+<div class="srow">
+  <div class="sc"><div class="scn" style="color:var(--bl)">490</div><div class="scl">總評論數</div></div>
+  <div class="sc"><div class="scn" style="color:var(--tl)">3.89</div><div class="scl">整體平均星等</div></div>
+  <div class="sc"><div class="scn" style="color:var(--y)">53</div><div class="scl">非預設評論數</div></div>
+  <div class="sc"><div class="scn" style="color:var(--o)">48</div><div class="scl">服務站點數</div></div>
+</div>
+<div class="sec">
+  <div class="sh">
+    <div class="snum">1</div>
+    <div class="stit">站點即時滿意度 <small>Instant CSAT per Station</small></div>
+  </div>
+  <div class="leg">
+    <div class="li"><div class="dot" style="background:var(--g);box-shadow:0 0 6px var(--g)"></div>優質 (avg &ge; 4.0)</div>
+    <div class="li"><div class="dot" style="background:var(--y);box-shadow:0 0 6px var(--y)"></div>普通 (3.0 &ndash; 3.9)</div>
+    <div class="li"><div class="dot" style="background:var(--r);box-shadow:0 0 6px var(--r)"></div>警示 (avg &lt; 3.0)</div>
+    <div class="li"><div class="dot" style="background:var(--r);animation:fl .8s infinite"></div>&#x26A0; 連續3次低評閃爍警示</div>
+  </div>
+  <div class="sgrid" id="sg"></div>
+</div>
+<div class="sec">
+  <div class="sh">
+    <div class="snum">2</div>
+    <div class="stit">關鍵字熱搜雲 <small>Keyword Frequency &amp; Alert</small></div>
+  </div>
+  <div class="ktabs">
+    <div class="kt active all" onclick="fk('all',this)">全部</div>
+    <div class="kt safety" onclick="fk('safety',this)">&#x26A0; 安全類（最高優先）</div>
+    <div class="kt clean" onclick="fk('clean',this)">&#x1F6BF; 清潔類</div>
+    <div class="kt process" onclick="fk('process',this)">&#x1F4F1; 流程類</div>
+  </div>
+  <div class="kcloud" id="kc"></div>
+  <div class="kdp" id="kd"></div>
+</div>
+<div class="sec">
+  <div class="sh">
+    <div class="snum">3</div>
+    <div class="stit">車況品質指數 <small>Vehicle Quality Index (VQI)</small></div>
+  </div>
+  <p style="font-size:13px;color:var(--td);margin-bottom:14px">公式：VQI = 車輛硬體負評數 &divide; 總訂單數 &times; 100%　|　僅列具車輛硬體相關回饋之車牌</p>
+  <div class="vwrap">
+    <table class="vt">
+      <thead><tr><th>排名</th><th>車牌</th><th>VQI 指數</th><th>硬體負評/總單</th><th>熱搜關鍵字</th><th>客戶評論</th></tr></thead>
+      <tbody id="vb"></tbody>
+    </table>
+  </div>
+</div>
+<footer>資料來源：0401&#8211;0412 客戶評論 &nbsp;&#183;&nbsp; ZOCHA 租車服務品質監控系統 &nbsp;&#183;&nbsp; 自動產生於 2026/04/14</footer>
+<script>
+var S=[{"name": "ZOCHA-高雄三民九如無人店", "avg": 2.33, "count": 3, "color": "red", "flash": false, "max_consecutive_low": 2}, {"name": "ZOCHA-南投水里無人店", "avg": 2.33, "count": 3, "color": "red", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA東港轉運站無人店", "avg": 2.67, "count": 3, "color": "red", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA-斗六站前無人店", "avg": 2.8, "count": 5, "color": "red", "flash": false, "max_consecutive_low": 1}, {"name": "馥御花園酒店無人店", "avg": 3.0, "count": 2, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-金門機場無人店", "avg": 3.0, "count": 1, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-桃園後站無人店", "avg": 3.0, "count": 4, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-竹北站前無人店", "avg": 3.0, "count": 1, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-蘇澳煙波大飯店無人店", "avg": 3.2, "count": 5, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "新竹欣益站前店", "avg": 3.5, "count": 4, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-嘉義高鐵無人店", "avg": 3.5, "count": 14, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA租機車-新營站前無人店", "avg": 3.57, "count": 7, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "GoGoRent竹北高鐵無人自助取還站-智能租車", "avg": 3.57, "count": 30, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA-台南善化無人店", "avg": 3.57, "count": 7, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA花蓮站前無人店", "avg": 3.61, "count": 18, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA-左營高鐵無人店", "avg": 3.66, "count": 35, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "彰化二水火車站無人店", "avg": 3.67, "count": 3, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-葆丞大甲火車站無人店", "avg": 3.67, "count": 3, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-台中高鐵無人店", "avg": 3.68, "count": 28, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA租機車-礁溪站前無人店(湯圍街)", "avg": 3.71, "count": 14, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA-台東站前店", "avg": 3.83, "count": 12, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "豐原轉運站B2-葆丞無人智慧租車(豐原火車站24小時)", "avg": 3.85, "count": 26, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "ZOCHA租機車-羅東前站無人店", "avg": 3.88, "count": 8, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-竹南火車站前無人店", "avg": 3.89, "count": 9, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-高雄站前店", "avg": 3.89, "count": 27, "color": "yellow", "flash": false, "max_consecutive_low": 1}, {"name": "台南煙波大飯店", "avg": 3.89, "count": 19, "color": "yellow", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA租機車-恆春轉運站無人店", "avg": 4.0, "count": 5, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-基隆站前無人店", "avg": 4.0, "count": 19, "color": "green", "flash": false, "max_consecutive_low": 1}, {"name": "逢甲夜市-葆丞無人智慧租車", "avg": 4.0, "count": 2, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA三創園區無人店(B2停車場)", "avg": 4.0, "count": 2, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-台南轉運無人店", "avg": 4.0, "count": 2, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-沙鹿火車站無人店", "avg": 4.0, "count": 2, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-台南高鐵無人店", "avg": 4.04, "count": 52, "color": "green", "flash": false, "max_consecutive_low": 1}, {"name": "彰化正楙店", "avg": 4.09, "count": 11, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "彰化田中高鐵站前無人店", "avg": 4.19, "count": 31, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "雲林虎尾高鐵無人店 ", "avg": 4.23, "count": 13, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "彰化員林火車站無人店", "avg": 4.3, "count": 10, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-台中站前店", "avg": 4.33, "count": 9, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-朝馬轉運站無人店", "avg": 4.33, "count": 3, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "礁溪轉運站無人店", "avg": 4.5, "count": 4, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-屏東站前無人店", "avg": 4.67, "count": 6, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-潮州站前無人店", "avg": 4.75, "count": 4, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "彰化田中火車站後站無人店", "avg": 5.0, "count": 4, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "台中后里奇典租車行", "avg": 5.0, "count": 13, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "速珂電動車竹北租車店", "avg": 5.0, "count": 1, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA台中站前店-24小時無人店", "avg": 5.0, "count": 2, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA-宜蘭頭城無人店", "avg": 5.0, "count": 3, "color": "green", "flash": false, "max_consecutive_low": 0}, {"name": "ZOCHA石牌國小無人店", "avg": 5.0, "count": 1, "color": "green", "flash": false, "max_consecutive_low": 0}];
+var K=[{"kw": "電池", "count": 6, "cat": "safety", "plates": ["EMD-6820", "EMY-8737", "EMV-1573", "EMD-8082", "EMD-7158", "EMD-7175"]}, {"kw": "車廂", "count": 6, "cat": "process", "plates": ["EMD-8127", "EQD-2731", "EMU-6973", "EMD-8083", "MKW-7053", "EMD-7175"]}, {"kw": "沒電", "count": 5, "cat": "safety", "plates": ["EMD-6820", "NVJ-3022", "ENY-2305", "EMD-8077", "EMS-1975"]}, {"kw": "鑰匙", "count": 5, "cat": "process", "plates": ["ENY-2305", "EMX-0620", "EMD-8077", "NVE-7603", "EMZ-3585"]}, {"kw": "安全帽", "count": 5, "cat": "clean", "plates": ["EPV-9866", "PDB-2603", "EPA-5033", "EQD-2731", "EQR-2013"]}, {"kw": "感應", "count": 2, "cat": "process", "plates": ["EMX-0620", "EQD-2731"]}, {"kw": "擋風板", "count": 2, "cat": "clean", "plates": ["EPA-5033", "EPV-9866"]}, {"kw": "停車", "count": 2, "cat": "process", "plates": ["MLQ-5325", "ENA-1189"]}, {"kw": "濕", "count": 2, "cat": "clean", "plates": ["EQD-2731", "ERQ-8206"]}, {"kw": "頭套", "count": 2, "cat": "clean", "plates": ["NXP-7292", "EQD-2731"]}, {"kw": "臭", "count": 2, "cat": "clean", "plates": ["EQR-2013", "ERQ-8206"]}, {"kw": "手機支架", "count": 2, "cat": "process", "plates": ["EMD-8103", "EMY-8737"]}, {"kw": "炫光", "count": 1, "cat": "clean", "plates": ["EPA-5033"]}, {"kw": "眩光", "count": 1, "cat": "clean", "plates": ["EPV-9866"]}, {"kw": "煞車", "count": 1, "cat": "safety", "plates": ["EMD-8077"]}, {"kw": "照片", "count": 1, "cat": "process", "plates": ["NEG-1661"]}, {"kw": "異音", "count": 1, "cat": "safety", "plates": ["EMD-6810"]}, {"kw": "超時", "count": 1, "cat": "process", "plates": ["EMD-7175"]}, {"kw": "費用", "count": 1, "cat": "process", "plates": ["EMD-7175"]}, {"kw": "程序複雜", "count": 1, "cat": "process", "plates": ["EMD-7175"]}, {"kw": "輪胎", "count": 1, "cat": "safety", "plates": ["EMD-6830"]}, {"kw": "沒氣", "count": 1, "cat": "safety", "plates": ["EMD-8103"]}, {"kw": "危險", "count": 1, "cat": "safety", "plates": ["EMD-8103"]}];
+var V=[{"plate": "EMD-6820", "neg_hw": 1, "total": 1, "vqi": 100.0, "hw_keywords": ["電池", "沒電"], "comments": [{"rating": 3, "comment": "請提醒客戶拿到車第一件事就是去換電池，今天差點在金門大橋上沒電無力，可怕", "store": "ZOCHA-金門機場無人店"}]}, {"plate": "NVJ-3022", "neg_hw": 1, "total": 1, "vqi": 100.0, "hw_keywords": ["沒電"], "comments": [{"rating": 4, "comment": "電瓶沒電QQ", "store": "ZOCHA-台中站前店"}]}, {"plate": "EMD-7175", "neg_hw": 1, "total": 1, "vqi": 100.0, "hw_keywords": ["電池", "車廂"], "comments": [{"rating": 2, "comment": "打開車廂電池上面都是水，租車程序複雜，租借或超時費用不明確", "store": "ZOCHA東港轉運站無人店"}]}, {"plate": "EMY-8737", "neg_hw": 1, "total": 1, "vqi": 100.0, "hw_keywords": ["電池"], "comments": [{"rating": 5, "comment": "第一台車無法租借，客服可解決換車！\n換車的手機支架無法使用，而且車輛沒有繳費，電池只能換一次🙄", "store": "ZOCHA石牌國小無人店"}]}, {"plate": "EME-7098", "neg_hw": 1, "total": 2, "vqi": 50.0, "hw_keywords": ["中柱"], "comments": [{"rating": 5, "comment": "讚! 是一次好的租車體驗，但租車的時候中柱就壞了，其實借得有點忐忑😆", "store": "ZOCHA-左營高鐵無人店"}]}, {"plate": "EMU-6973", "neg_hw": 1, "total": 2, "vqi": 50.0, "hw_keywords": ["車廂"], "comments": [{"rating": 1, "comment": "車廂無法開啟", "store": "ZOCHA-高雄三民九如無人店"}]}, {"plate": "EMD-8077", "neg_hw": 1, "total": 2, "vqi": 50.0, "hw_keywords": ["煞車", "沒電"], "comments": [{"rating": 5, "comment": "鑰匙快沒電，煞車嘰嘰叫", "store": "ZOCHA-台南高鐵無人店"}]}, {"plate": "EMS-1975", "neg_hw": 1, "total": 2, "vqi": 50.0, "hw_keywords": ["沒電"], "comments": [{"rating": 3, "comment": "讚! 是一次好的租車體驗\n磁扣好像沒電", "store": "ZOCHA-台中高鐵無人店"}]}, {"plate": "EMD-8127", "neg_hw": 1, "total": 2, "vqi": 50.0, "hw_keywords": ["車廂"], "comments": [{"rating": 1, "comment": "車廂關不緊", "store": "ZOCHA-台南高鐵無人店"}]}, {"plate": "EMD-8103", "neg_hw": 1, "total": 2, "vqi": 50.0, "hw_keywords": ["沒氣", "沒紋路", "晃動"], "comments": [{"rating": 5, "comment": "讚! 是一次好的租車體驗\n太幸運啦", "store": "ZOCHA-斗六站前無人店"}, {"rating": 1, "comment": "明明現場有其他車輛，卻不能選擇，給我分配限定車，而此車車況不佳，沒手機支架，後輪沒紋路也沒氣，騎起來晃動極大，很危險，建議此車盡早檢查後再出租", "store": "ZOCHA-斗六站前無人店"}]}, {"plate": "EMD-6828", "neg_hw": 1, "total": 2, "vqi": 50.0, "hw_keywords": ["手機架", "起速"], "comments": [{"rating": 1, "comment": "手機架太硬了，很難拿出手機，搞得我的手機保護都被磨傷…\n\n另外，機車起速設定太慢了，很容易有可能被後面的車駕按喇叭，請改進，謝謝。", "store": "ZOCHA租機車-礁溪站前無人店(湯圍街)"}]}, {"plate": "EMD-7158", "neg_hw": 1, "total": 3, "vqi": 33.3, "hw_keywords": ["電池", "保養"], "comments": [{"rating": 4, "comment": "換電池時跳保養訊息，希望下次租借的車是保養好的，謝謝", "store": "ZOCHA-台中高鐵無人店"}]}, {"plate": "EQD-2731", "neg_hw": 1, "total": 3, "vqi": 33.3, "hw_keywords": ["車廂"], "comments": [{"rating": 2, "comment": "電話客服沒有回應，車輛感應不佳，避震有問題", "store": "ZOCHA-台南高鐵無人店"}, {"rating": 5, "comment": "讚! 是一次好的租車體驗\n離高鐵站近很方便\n但車廂有點難卡緊\n安全帽是濕的\n可能是連假昨天又下豪大雨的關係\n建議可以像外面gogoro付個塑膠防塵頭套 謝謝", "store": "ZOCHA-台南高鐵無人店"}]}, {"plate": "EMD-6810", "neg_hw": 1, "total": 3, "vqi": 33.3, "hw_keywords": ["異音", "保養"], "comments": [{"rating": 2, "comment": "這台車顯示需要保養\n騎起來有異音 龍頭轉向不是很穩", "store": "ZOCHA-斗六站前無人店"}, {"rating": 3, "comment": "不是很好的經驗", "store": "ZOCHA-斗六站前無人店"}]}, {"plate": "EMD-6830", "neg_hw": 1, "total": 3, "vqi": 33.3, "hw_keywords": ["輪胎"], "comments": [{"rating": 3, "comment": "輪胎感覺沒什麼氣了", "store": "ZOCHA-左營高鐵無人店"}]}, {"plate": "MKW-7053", "neg_hw": 1, "total": 3, "vqi": 33.3, "hw_keywords": ["車廂"], "comments": [{"rating": 2, "comment": "車廂不好關，取車電量只有3格", "store": "ZOCHA-台南高鐵無人店"}]}, {"plate": "EMD-8083", "neg_hw": 1, "total": 4, "vqi": 25.0, "hw_keywords": ["車廂"], "comments": [{"rating": 3, "comment": "還車時車廂打不開\n但客服從後台協助解決了\n", "store": "ZOCHA花蓮站前無人店"}]}, {"plate": "EMV-1573", "neg_hw": 1, "total": 5, "vqi": 20.0, "hw_keywords": ["電池"], "comments": [{"rating": 3, "comment": "讚! 是一次好的租車體驗，電池永遠都是40%", "store": "ZOCHA-竹南火車站前無人店"}]}, {"plate": "ENY-2305", "neg_hw": 1, "total": 5, "vqi": 20.0, "hw_keywords": ["沒電"], "comments": [{"rating": 5, "comment": "讚! 是一次好的租車體驗,磁卡鑰匙好像快沒電了，請注意", "store": "ZOCHA-基隆站前無人店"}]}, {"plate": "ERQ-8206", "neg_hw": 1, "total": 5, "vqi": 20.0, "hw_keywords": ["手把"], "comments": [{"rating": 1, "comment": "帽子很濕有臭臭的味道", "store": "ZOCHA-左營高鐵無人店"}, {"rating": 3, "comment": "手把有問題 ", "store": "ZOCHA-左營高鐵無人店"}]}];
+function rS(){
+  var g=document.getElementById('sg');g.innerHTML='';
+  S.forEach(function(s){
+    var c=document.createElement('div');c.className='scard';
+    var ac=s.color==='green'?'var(--g)':(s.color==='yellow'?'var(--y)':'var(--r)');
+    var bw=(s.avg/5*100).toFixed(1);
+    var fc=s.flash?' flash':'';
+    var fb=s.flash?'<span class="abadge">&#x26A0; 閃爍警示</span>':'';
+    c.innerHTML='<div class="tl '+s.color+fc+'"></div>'+
+      '<div style="flex:1;min-width:0"><div class="sn" title="'+s.name+'">'+s.name+'</div>'+
+      '<div class="sbg"><div class="sfill" style="width:'+bw+'%;background:'+ac+'"></div></div></div>'+
+      '<div style="text-align:right;flex-shrink:0"><div class="savg" style="color:'+ac+'">'+s.avg.toFixed(2)+'</div>'+
+      '<div class="scnt">'+s.count+' 評</div></div>'+fb;
+    g.appendChild(c);
+  });
+}
+rS();
+var ak=null;
+function rK(cat){
+  var cl=document.getElementById('kc');cl.innerHTML='';
+  var f=cat==='all'?K:K.filter(function(k){return k.cat===cat;});
+  if(!f.length){cl.innerHTML='<div style="color:var(--td);font-size:13px">此分類目前無關鍵字記錄</div>';return;}
+  var mx=Math.max.apply(null,f.map(function(k){return k.count;}));
+  f.forEach(function(k){
+    var sz=13+Math.round((k.count/mx)*14);
+    var t=document.createElement('div');t.className='ktag '+k.cat;t.style.fontSize=sz+'px';
+    var pb=k.cat==='safety'?'<div class="kpri">高優先</div>':'';
+    t.innerHTML=pb+k.kw+'<span class="kcnt">'+k.count+'</span>';
+    t.onclick=function(){skd(k);};cl.appendChild(t);
+  });
+}
+function fk(cat,el){
+  document.querySelectorAll('.kt').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');rK(cat);
+  document.getElementById('kd').classList.remove('open');ak=null;
+}
+function skd(k){
+  var p=document.getElementById('kd');
+  if(ak===k.kw){p.classList.remove('open');ak=null;return;}
+  ak=k.kw;
+  var cl=k.cat==='safety'?'&#x26A0; 安全類':(k.cat==='clean'?'&#x1F6BF; 清潔類':'&#x1F4F1; 流程類');
+  var ph=k.plates.map(function(x){return'<span class="ptag">'+x+'</span>';}).join('');
+  p.innerHTML='<h4>'+cl+' &nbsp; 關鍵字「'+k.kw+'」出現 <span style="color:var(--y)">'+k.count+'</span> 次</h4>'+
+    '<div style="margin-top:8px;font-size:12px;color:var(--td)">相關車牌：</div>'+
+    '<div style="margin-top:6px">'+(ph||'<span style="color:var(--td)">—</span>')+'</div>';
+  p.classList.add('open');
+}
+rK('all');
+function vc(v){if(v>=80)return'var(--r)';if(v>=50)return'var(--o)';if(v>=30)return'var(--y)';return'var(--tl)';}
+function rV(){
+  var tb=document.getElementById('vb');
+  V.forEach(function(v,i){
+    var col=vc(v.vqi);
+    var rc=i<3?'var(--r)':(i<8?'var(--o)':'var(--td)');
+    var kh=v.hw_keywords.map(function(k){return'<span class="vkc">'+k+'</span>';}).join('');
+    var r=document.createElement('tr');
+    r.innerHTML='<td style="color:'+rc+';font-weight:700">'+(i+1)+'</td>'+
+      '<td><span class="vpl">'+v.plate+'</span></td>'+
+      '<td><div class="vbw"><div class="vbbg"><div class="vbfill" style="width:'+v.vqi+'%;background:'+col+'"></div></div>'+
+      '<div class="vpct" style="color:'+col+'">'+v.vqi+'%</div></div></td>'+
+      '<td style="color:var(--td)">'+v.neg_hw+' / '+v.total+'</td>'+
+      '<td><div class="vkl">'+(kh||'—')+'</div></td>'+
+      '<td><button class="ebtn" onclick="tc('+i+')">&#x1F4AC; 評論</button></td>';
+    tb.appendChild(r);
+    var cr=document.createElement('tr');cr.id='cr'+i;cr.className='cr';
+    var ch=v.comments.map(function(c){
+      var st='&#9733;'.repeat(c.rating)+'&#9734;'.repeat(Math.max(0,5-c.rating));
+      return'<div class="ci"><div class="cst">'+st+'</div>'+
+        '<div><div style="font-size:11px;color:var(--td);margin-bottom:3px">'+c.store+'</div>'+
+        '<div class="ctxt">'+c.comment+'</div></div></div>';
+    }).join('');
+    cr.innerHTML='<td colspan="6"><div class="cb">'+ch+'</div></td>';
+    tb.appendChild(cr);
+  });
+}
+function tc(i){document.getElementById('cr'+i).classList.toggle('open');}
+rV();
+</script>
+</body>
+</html>
