@@ -3,3 +3,4 @@
 *.json
 __pycache__/
 *.py
+!gen_html.py
